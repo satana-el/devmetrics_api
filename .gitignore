@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+
+# Django
+*.log
+db.sqlite3
+
+# Static/media (collected/generated files)
+staticfiles/
+media/
+
+#Editor
+pyrightconfig.json

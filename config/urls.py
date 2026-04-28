@@ -20,5 +20,6 @@ from links import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/shorten/', views.create_short_link)
+    path('api/shorten/', views.create_short_link),
+    path('<str:short_code>/', views.redirect_link),
 ]

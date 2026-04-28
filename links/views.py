@@ -4,6 +4,8 @@ from rest_framework import status
 from .models import Link
 from .serializers import LinkSerializer
 from django.contrib.auth.models import AnonymousUser
+from django.shortcuts import redirect, get_object_or_404
+from .models import Link
 import string
 import random
 
@@ -29,3 +31,12 @@ def create_short_link(request):
         return Response(LinkSerializer(link).data, status=201)
 
     return Response(serializer.errors, status=400)
+
+def redirect_link(request, short_code):
+    link = get_object_or_404(Link, short_code=short_code)
+
+    # increment click count
+    link.click_count += 1
+    link.save(update_fields=['click_count'])
+
+    return redirect(link.original_url)

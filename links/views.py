@@ -6,22 +6,30 @@ from .serializers import LinkSerializer
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import redirect, get_object_or_404
 from .models import Link
+from accounts.rate_limit import is_rate_limited
 import string
 import random
 
-def generate_code(length=6):
+def generate_unique_code(length=6):
     chars = string.ascii_letters + string.digits
-    return ''.join(random.choices(chars, k=length))
+
+    while True:
+        code = ''.join(random.choices(chars, k=length))
+
+        if not Link.objects.filter(short_code=code).exists():
+            return code
 
 @api_view(['POST'])
 def create_short_link(request):
     if isinstance(request.user, AnonymousUser):
         return Response({"error": "Authentication required"}, status=401)
+    if is_rate_limited(request.user):
+        return Response({"error": "Rate limit exceeded"}, status=429)
 
     serializer = LinkSerializer(data=request.data)
 
     if serializer.is_valid():
-        short_code = generate_code()
+        short_code = generate_unique_code()
 
         link = serializer.save(
             user=request.user,
